@@ -2,7 +2,7 @@ from .cognitive_engine import CognitiveEngine
 from .learning_annex import LearningAnnex
 from .personality import Personality
 from .tools import FileSystemTool
-from .oracle import Oracle
+from .oracle import SentientOracle
 
 class Director:
     def __init__(self, personality: Personality):
@@ -11,7 +11,7 @@ class Director:
         It manages the agent's internal state and directs its actions.
         """
         self.personality = personality
-        self.oracle = Oracle()
+        self.oracle = SentientOracle()
         self.cognitive_engine = CognitiveEngine(personality, self.oracle)
         self.learning_annex = LearningAnnex()
 
