@@ -1,3 +1,5 @@
+import os
+
 class Tool:
     def __init__(self, name, description):
         self.name = name
@@ -6,9 +8,12 @@ class Tool:
     def use(self, *args, **kwargs):
         raise NotImplementedError
 
-class ExampleTool(Tool):
+class FileSystemTool(Tool):
     def __init__(self):
-        super().__init__("ExampleTool", "An example tool that does nothing.")
+        super().__init__("FileSystemTool", "A tool for interacting with the file system.")
 
-    def use(self, *args, **kwargs):
-        return "This is an example tool."
+    def use(self, path="."):
+        try:
+            return f"Files in '{path}':\n" + "\n".join(os.listdir(path))
+        except Exception as e:
+            return f"Error listing files: {e}"
