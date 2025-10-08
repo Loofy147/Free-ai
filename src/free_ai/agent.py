@@ -3,7 +3,7 @@ from .cognitive_engine import CognitiveEngine
 from .learning_annex import LearningAnnex
 from .personality import Personality
 from .tools import FileSystemTool
-from .oracle import Oracle
+from .oracle import SentientOracle
 from .memory import VectorMemory
 
 logger = logging.getLogger(__name__)
@@ -18,7 +18,7 @@ class Director:
         self.name = name
         self.role = role
         self.personality = personality
-        self.oracle = Oracle()
+        self.oracle = SentientOracle()
         self.memory = shared_memory
         self.cognitive_engine = CognitiveEngine(personality, self.oracle, self.memory)
         self.learning_annex = LearningAnnex()

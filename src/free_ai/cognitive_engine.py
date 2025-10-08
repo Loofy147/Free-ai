@@ -2,13 +2,13 @@ import logging
 import json
 from typing import Dict, List, Union
 from .personality import Personality
-from .oracle import Oracle
+from .oracle import SentientOracle
 from .memory import VectorMemory
 
 logger = logging.getLogger(__name__)
 
 class CognitiveEngine:
-    def __init__(self, personality: Personality, oracle: Oracle, memory: VectorMemory):
+    def __init__(self, personality: Personality, oracle: SentientOracle, memory: VectorMemory):
         """
         The Cognitive Engine is the agent's core consciousness.
         It uses an Oracle and its own VectorMemory to form plans and orchestrate their execution.
@@ -56,7 +56,7 @@ class CognitiveEngine:
         if not plan:
             return True
 
-        VALID_ACTIONS = ["use_tool", "express_personality", "delegate_task", "wait_for_reply", "final_answer"]
+        VALID_ACTIONS = ["use_tool", "express_personality", "delegate_task", "wait_for_reply", "final_answer", "error"]
 
         for step in plan:
             action_type = step.get("action")
