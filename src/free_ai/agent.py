@@ -9,17 +9,17 @@ from .memory import VectorMemory
 logger = logging.getLogger(__name__)
 
 class Director:
-    def __init__(self, name: str, role: str, personality: Personality, external_tools: dict):
+    def __init__(self, name: str, role: str, personality: Personality, external_tools: dict, shared_memory: VectorMemory):
         """
         The Director is the central orchestrator of the Chimera.
         It manages the agent's internal state and directs its actions.
-        It now has a unique name and a defined role within the agent society.
+        It now connects to a shared, collective memory.
         """
         self.name = name
         self.role = role
         self.personality = personality
         self.oracle = Oracle()
-        self.memory = VectorMemory()
+        self.memory = shared_memory
         self.cognitive_engine = CognitiveEngine(personality, self.oracle, self.memory)
         self.learning_annex = LearningAnnex()
 
