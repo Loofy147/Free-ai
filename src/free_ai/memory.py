@@ -2,8 +2,8 @@ class Memory:
     def __init__(self):
         self.history = []
 
-    def add_message(self, role, content):
+    def add_message(self, role: str, content: str):
         self.history.append({"role": role, "content": content})
 
-    def get_history(self):
+    def get_history(self) -> list:
         return self.history

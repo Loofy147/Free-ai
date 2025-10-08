@@ -4,10 +4,9 @@ from src.free_ai.tools import FileSystemTool
 from src.free_ai.personality import WhimsicalPersonality, PhilosophicalPersonality
 
 def main():
-    print("--- The Expressive Agent Awakens ---")
+    print("--- The Expressive Agent Awakens (Again) ---")
 
     # Choose a personality for the agent
-    # personality = PhilosophicalPersonality()
     personality = WhimsicalPersonality()
 
     # Initialize the components
@@ -15,7 +14,7 @@ def main():
     tools = [FileSystemTool()]
 
     # Create the agent with its chosen personality
-    agent = Agent(personality, memory, tools)
+    agent = Agent(personality, memory, {tool.name: tool for tool in tools})
 
     # --- A Conversation with the Agent ---
     prompts = [
