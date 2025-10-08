@@ -1,32 +1,48 @@
 import json
+import re
 
 class LLM:
     def generate(self, history):
-        # In the future, this will call a real LLM API.
-        # For now, it returns a mock response that can simulate a tool call.
-
         last_message = history[-1]
 
-        # If the last message is from a tool, generate a final answer.
         if last_message["role"] == "tool":
             return {
                 "type": "final_answer",
-                "content": f"Okay, I have the file list. The final answer is based on this tool output."
+                "content": "I have completed the file operation. What should I do next?"
             }
 
-        # If the last message is from the user, decide whether to call a tool.
         if last_message["role"] == "user":
             user_input = last_message["content"]
-            if "list files" in user_input.lower():
-                # Simulate a tool call
+
+            # Check for "write file" command
+            write_match = re.search(r"write to file '(.+?)' with content: (.+)", user_input, re.DOTALL)
+            if write_match:
+                filepath, content = write_match.groups()
                 return {
                     "type": "tool_call",
                     "tool_name": "FileSystemTool",
-                    "tool_args": {"path": "."}
+                    "tool_args": {"operation": "write_file", "filepath": filepath, "content": content}
                 }
 
-        # Default to a final answer if no other condition is met.
+            # Check for "read file" command
+            read_match = re.search(r"read file '(.+?)'", user_input)
+            if read_match:
+                filepath = read_match.group(1)
+                return {
+                    "type": "tool_call",
+                    "tool_name": "FileSystemTool",
+                    "tool_args": {"operation": "read_file", "filepath": filepath}
+                }
+
+            # Check for "list files" command
+            if "list files" in user_input.lower():
+                return {
+                    "type": "tool_call",
+                    "tool_name": "FileSystemTool",
+                    "tool_args": {"operation": "list_files", "path": "."}
+                }
+
         return {
             "type": "final_answer",
-            "content": "This is a mock response from the LLM."
+            "content": "I'm not sure how to handle that request. Please try again."
         }
