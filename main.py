@@ -1,8 +1,9 @@
-import json
 import logging
+import time
 from src.free_ai.agent import Director
-from src.free_ai.personality import WhimsicalPersonality
-from src.free_ai.tools import FileSystemTool
+from src.free_ai.personality import WhimsicalPersonality, PhilosophicalPersonality
+from src.free_ai.agora import Agora
+import json
 
 # --- Logging Configuration ---
 logging.basicConfig(
@@ -12,77 +13,116 @@ logging.basicConfig(
 )
 logger = logging.getLogger("ExecutorBody")
 
-# --- The Main Execution Loop (The ExecutorBody) ---
+# --- The Body's External Tools ---
+def google_search(query: str) -> dict:
+    """A placeholder for the real google_search tool."""
+    logger.info(f"Simulating Google Search for: '{query}'")
+    if "d in solid" in query.lower():
+        content = "The 'D' in SOLID stands for the Dependency Inversion Principle."
+        return {"status": "success", "content": content}
+    return {"status": "success", "content": "No relevant results found."}
 
+def final_answer(answer: str) -> dict:
+    """A tool to provide the final answer and terminate the process."""
+    return {"status": "success", "message": f"Final Answer: {answer}"}
+
+EXTERNAL_TOOLS = {"google_search": google_search}
+
+# --- The Main Execution Loop (The Multi-Agent Society) ---
 def main():
-    logger.info("--- Project Carapace: The ExecutorBody is awakening... ---")
+    logger.info("--- Project Agora: A Society of Agents is awakening... ---")
 
-    # 1. The Body instantiates the Director with a chosen personality.
-    personality = WhimsicalPersonality()
-    director = Director(personality)
-    history = []
+    # 1. Create the shared world.
+    agora = Agora()
+    personality_a = WhimsicalPersonality()
+    personality_b = PhilosophicalPersonality()
 
-    # 2. Define the high-level goal for the Carapace Challenge.
-    goal = "Refactor your `FileSystemTool` to add a new `modify_file` operation that appends text to a file."
-    logger.info(f"Received goal: {goal}")
-    history.append({"role": "system", "content": f"The goal is: {goal}"})
+    # 2. Create the agents that will inhabit the world.
+    agents = [
+        Director(name="Manager-Alpha", role="Manager", personality=personality_a, external_tools=EXTERNAL_TOOLS),
+        Director(name="Researcher-Beta", role="Researcher", personality=personality_b, external_tools=EXTERNAL_TOOLS),
+    ]
 
-    # 3. The Body enters the main loop, driven by the Director's decisions.
-    for i in range(10): # Add a safety break to prevent infinite loops.
-        # a. Get the next intended action from the Director.
-        action = director.determine_next_action(goal, history)
+    # 3. Assign the initial high-level goal to the Manager agent.
+    initial_goal = "I need to know what the 'D' in SOLID stands for. Please find a 'Researcher' agent and delegate this task."
+    agent_goals = { "Manager-Alpha": initial_goal }
+    agent_histories = { agent.name: [] for agent in agents }
+    active_delegations = {}
 
-        action_type = action.get("action")
-        logger.info(f"Director proposes action: {action_type}")
-
-        if action_type == "finish":
-            logger.info(f"The Director has finished its plan. Reason: {action.get('reason')}")
+    # 4. The main society simulation loop.
+    for i in range(20): # Safety break
+        all_goals_complete = not agent_goals
+        if all_goals_complete:
+            logger.info("All agents have completed their goals. Simulation ending.")
             break
 
-        # b. The Body executes the action.
-        result = None
-        if action_type == "express_personality":
-            context = action.get("arguments", {}).get("context", "")
-            result = personality.express(context=context)
-            logger.info(f"Expressing personality: {result}")
-            history.append({"role": "assistant", "content": result})
+        for agent in agents:
+            logger.info(f"--- It is now {agent.name}'s ({agent.role}) turn to act. ---")
 
-        elif action_type == "use_tool":
-            tool_name = action.get("tool_name")
-            arguments = action.get("arguments", {})
+            # a. Check for new tasks on the Agora if the agent doesn't have a goal.
+            if agent.name not in agent_goals:
+                messages = agora.get_unclaimed_messages_for_role(agent.role)
+                if messages:
+                    task = messages[0]
+                    agora.claim_message(task['id'], by_agent=agent.name)
+                    agent_goals[agent.name] = task['content']
+                    agent_histories[agent.name] = [{"role": "system", "content": f"New goal accepted from Agora: {task['content']}"}]
+                    active_delegations[agent.name] = {"type": "delegatee", "original_message_id": task['id']}
 
-            logger.info(f"Preparing to use tool '{tool_name}'...")
-            try:
-                if tool_name in director.tools:
-                    tool = director.tools[tool_name]
-                    if hasattr(tool, 'use'):
-                        result = tool.use(**arguments)
+            # b. If the agent has a goal, it thinks and acts.
+            if agent.name in agent_goals:
+                goal = agent_goals[agent.name]
+                history = agent_histories[agent.name]
+                action = agent.determine_next_action(goal, history)
+                action_type = action.get("action")
+                logger.info(f"'{agent.name}' proposes action: {action_type}")
+
+                # c. Execute the action.
+                if action_type == "finish":
+                    if agent.name in active_delegations:
+                        delegation_info = active_delegations.pop(agent.name)
+                        if delegation_info.get("type") == "delegatee":
+                            final_result = history[-1].get("result", {"status": "success", "message": "Task complete."})
+                            agora.post_reply(delegation_info["original_message_id"], from_agent=agent.name, result=final_result)
+                    del agent_goals[agent.name]
+                    continue
+
+                result = None
+                if action_type == "delegate_task":
+                    to_role = action.get("arguments", {}).get("to_role")
+                    content = action.get("arguments", {}).get("content")
+                    message_id = agora.post_message(from_agent=agent.name, to_agent_role=to_role, content=content)
+                    active_delegations[agent.name] = {"type": "delegator", "delegated_message_id": message_id}
+                    result = {"status": "success", "message": f"Task delegated with message ID {message_id}."}
+
+                elif action_type == "wait_for_reply":
+                    delegation_info = active_delegations.get(agent.name)
+                    if delegation_info and delegation_info.get("type") == "delegator":
+                        reply = agora.get_reply_for_message(delegation_info["delegated_message_id"])
+                        if reply:
+                            result = reply['result']
+                            active_delegations.pop(agent.name)
+                        else:
+                            logger.info(f"'{agent.name}' is waiting for a reply...")
+                            result = {"status": "pending", "message": "Waiting for reply."}
+
+                elif action_type == "use_tool":
+                    tool_name = action.get("tool_name")
+                    arguments = action.get("arguments", {})
+                    tool = agent.tools.get(tool_name)
+                    if tool:
+                         result = tool.use(**arguments) if hasattr(tool, 'use') else tool(**arguments)
                     else:
-                        result = tool(**arguments)
-                else:
-                    result = {"status": "error", "message": f"Tool '{tool_name}' not found."}
-            except Exception as e:
-                logger.error(f"An unexpected error occurred during the execution of tool '{tool_name}'.", exc_info=True)
-                result = {"status": "error", "message": f"Unexpected runtime error: {type(e).__name__}: {e}"}
+                        result = {"status": "error", "message": f"Tool '{tool_name}' not found."}
+
+                logger.info(f"Action '{action_type}' by '{agent.name}' executed. Result: {result}")
+                history.append({"role": "body", "action_taken": action, "result": result})
+
+                if action_type == "use_tool" and tool_name == "final_answer":
+                    del agent_goals[agent.name]
 
 
-            logger.info(f"Tool '{tool_name}' executed. Result: {result}")
-            history.append({"role": "body", "action_taken": action, "result": result})
-
-        else:
-            logger.error(f"The Director proposed an unknown action type: '{action_type}'")
-            break
-
-        # c. The Body checks for failure before continuing.
-        error_found = False
-        if isinstance(result, dict) and result.get("status") == "error":
-            error_found = True
-
-        if error_found:
-            logger.error(f"A critical error was detected. Halting the plan. Reason: {result.get('message')}")
-            break
-
-    logger.info("--- Project Carapace: The Body's work is done. ---")
+    logger.info("--- Project Agora: The simulation has ended. ---")
 
 if __name__ == "__main__":
     main()

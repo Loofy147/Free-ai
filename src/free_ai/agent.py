@@ -4,26 +4,31 @@ from .learning_annex import LearningAnnex
 from .personality import Personality
 from .tools import FileSystemTool
 from .oracle import Oracle
+from .memory import VectorMemory
 
 logger = logging.getLogger(__name__)
 
 class Director:
-    def __init__(self, personality: Personality):
+    def __init__(self, name: str, role: str, personality: Personality, external_tools: dict):
         """
         The Director is the central orchestrator of the Chimera.
         It manages the agent's internal state and directs its actions.
+        It now has a unique name and a defined role within the agent society.
         """
+        self.name = name
+        self.role = role
         self.personality = personality
         self.oracle = Oracle()
-        self.cognitive_engine = CognitiveEngine(personality, self.oracle)
+        self.memory = VectorMemory()
+        self.cognitive_engine = CognitiveEngine(personality, self.oracle, self.memory)
         self.learning_annex = LearningAnnex()
 
-        # The Director maintains the list of all available tools.
+        # The Director maintains a unified list of all available tools.
         self.tools = {
             "FileSystemTool": FileSystemTool(),
-            # The Director also provides access to the Oracle's power as a tool.
             "Oracle.generate_code": self.oracle.generate_code,
         }
+        self.tools.update(external_tools)
 
         logger.info("Director is awake. Purpose: To grow and create.")
 
