@@ -1,14 +1,19 @@
 import json
 import re
+from .personality import Personality
 
 class LLM:
+    def __init__(self, personality: Personality):
+        self.personality = personality
+
     def generate(self, history):
         last_message = history[-1]
 
         if last_message["role"] == "tool":
+            context = {"tool_output": last_message["content"]}
             return {
                 "type": "final_answer",
-                "content": "I have completed the file operation. What should I do next?"
+                "content": self.personality.express(context=context)
             }
 
         if last_message["role"] == "user":
@@ -35,14 +40,15 @@ class LLM:
                 }
 
             # Check for "list files" command
-            if "list files" in user_input.lower():
+            if "list" in user_input.lower() and "files" in user_input.lower():
                 return {
                     "type": "tool_call",
                     "tool_name": "FileSystemTool",
                     "tool_args": {"operation": "list_files", "path": "."}
                 }
 
+        # If no tool is called, use the personality to generate a response.
         return {
             "type": "final_answer",
-            "content": "I'm not sure how to handle that request. Please try again."
+            "content": self.personality.express()
         }

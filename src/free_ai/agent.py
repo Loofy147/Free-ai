@@ -1,6 +1,9 @@
+from .llm import LLM
+from .personality import Personality
+
 class Agent:
-    def __init__(self, llm, memory, tools):
-        self.llm = llm
+    def __init__(self, personality: Personality, memory, tools):
+        self.llm = LLM(personality)
         self.memory = memory
         self.tools = {tool.name: tool for tool in tools}
 

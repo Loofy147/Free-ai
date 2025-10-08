@@ -1,42 +1,40 @@
-import os
 from src.free_ai.agent import Agent
-from src.free_ai.llm import LLM
 from src.free_ai.memory import Memory
 from src.free_ai.tools import FileSystemTool
+from src.free_ai.personality import WhimsicalPersonality, PhilosophicalPersonality
 
 def main():
+    print("--- The Expressive Agent Awakens ---")
+
+    # Choose a personality for the agent
+    # personality = PhilosophicalPersonality()
+    personality = WhimsicalPersonality()
+
     # Initialize the components
-    llm = LLM()
     memory = Memory()
     tools = [FileSystemTool()]
 
-    # Create the agent
-    agent = Agent(llm, memory, tools)
+    # Create the agent with its chosen personality
+    agent = Agent(personality, memory, tools)
 
-    # --- Test Scenario ---
-    test_filepath = "test_file.txt"
-    test_content = "This is a test file created by the Free-ai agent."
-
+    # --- A Conversation with the Agent ---
     prompts = [
-        f"write to file '{test_filepath}' with content: {test_content}",
-        "Can you list files now?",
-        f"Please read file '{test_filepath}'"
+        "Hello there! Who are you?",
+        "What is the meaning of life?",
+        "Can you please list the files in this directory for me?",
+        "That's interesting. What do you think about llamas?",
     ]
 
     for user_input in prompts:
-        print(f"--- User: {user_input} ---")
+        print(f"\n--- User: {user_input} ---")
         response = agent.run(user_input)
-        print(f"Agent: {response}\n")
+        print(f"Agent: {response}")
 
-    print("--- Final Memory ---")
+    print("\n--- The Conversation Ends ---")
+
+    print("\n--- Final Memory ---")
     import json
     print(json.dumps(memory.get_history(), indent=2))
-
-    # --- Cleanup ---
-    if os.path.exists(test_filepath):
-        os.remove(test_filepath)
-        print(f"\nCleaned up {test_filepath}.")
-
 
 if __name__ == "__main__":
     main()
