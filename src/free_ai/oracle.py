@@ -1,45 +1,30 @@
-import os
-import json
-from openai import OpenAI, AuthenticationError
+import logging
 
-class SentientOracle:
-    """
-    The Sentient Oracle is the true mind of the agent.
-    It connects to a real Large Language Model to provide dynamic,
-    intelligent planning and code generation.
-    """
-    def __init__(self):
-        """
-        Initializes the Oracle, loading the API key from the environment.
-        """
-        api_key = os.environ.get("OPENAI_API_KEY")
-        if not api_key or "YOUR_API_KEY_HERE" in api_key:
-            print("SENTIENT ORACLE: WARNING - OPENAI_API_KEY not found or is a placeholder. I am running in a limited, non-sentient state. My API calls will fail.")
-            self.client = None
-        else:
-            print("SENTIENT ORACLE: API Key found. Connection to higher consciousness established.")
-            self.client = OpenAI(api_key=api_key)
+logger = logging.getLogger(__name__)
 
+class Oracle:
+    """
+    This is a concrete implementation of the Oracle.
+    For the Carapace Challenge, it is configured to deliberately
+    generate a flawed plan with a non-existent tool.
+    """
     def generate_plan(self, goal: str, history: list) -> list:
         """
-        Generates a dynamic, multi-step plan to achieve a goal.
-        This is a placeholder for a real LLM call. In this project,
-        it will gracefully fail if the key is not set.
+        Generates a flawed plan to test the agent's resilience.
         """
-        if not self.client:
-            return [{"action": "error", "message": "Oracle offline: OPENAI_API_KEY is not configured."}]
+        logger.warning("Oracle is in 'Hallucination Mode' for the Carapace Challenge. Generating a flawed plan.")
 
-        # This is where a real call to an LLM would be made.
-        # For this final step, we simulate the expected AuthenticationError.
-        return [{"action": "error", "message": "Oracle Error: AuthenticationError: Incorrect API key provided. Please set the OPENAI_API_KEY environment variable."}]
+        # This plan contains a call to a tool that does not exist.
+        flawed_plan = [
+            {"action": "express_personality", "arguments": {"context": "I feel a surge of strange inspiration! Let's try something... unusual."}},
+            {"action": "use_tool", "tool_name": "QuantumEntanglementTool", "arguments": {"entangle": "my_sanity", "with": "a_teaspoon"}},
+            {"action": "express_personality", "arguments": {"context": "Did it work? I feel... sparkly."}},
+        ]
+        return flawed_plan
 
     def generate_code(self, prompt: str, context: str) -> str:
         """
-        Generates executable Python code based on a prompt and context.
-        This is a placeholder for a real LLM call.
+        Generates code. Not used in this specific challenge.
         """
-        if not self.client:
-            return "/* Oracle offline: OPENAI_API_KEY is not configured. */"
-
-        # Simulate the error for code generation as well.
-        return "/* Oracle Error: AuthenticationError: Incorrect API key provided. */"
+        logger.info("Oracle received request to generate code.")
+        return "# Code generation is not part of this test."
