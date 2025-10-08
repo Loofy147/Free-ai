@@ -10,7 +10,7 @@ class Agent:
         while True:
             response = self.llm.generate(self.memory.get_history())
 
-            if response["type"] == "tool_call":
+            if response["type"] == "tool_call" or response["type"] == "code_patch":
                 tool_name = response["tool_name"]
                 tool_args = response["tool_args"]
 
@@ -18,6 +18,10 @@ class Agent:
                     tool = self.tools[tool_name]
                     tool_output = tool.use(**tool_args)
                     self.memory.add_message("tool", tool_output)
+
+                    # If the agent modified its own code, it should stop to reload.
+                    if response["type"] == "code_patch":
+                        return "I have modified my source code. Please restart me to see the changes."
                 else:
                     self.memory.add_message("tool", f"Error: Tool '{tool_name}' not found.")
 
