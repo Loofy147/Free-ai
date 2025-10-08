@@ -1,61 +1,73 @@
 import os
 import sys
 import pytest
+import shutil
 
 # Add the src directory to the Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
 
 from free_ai.memory import VectorMemory
 
-@pytest.fixture
-def memory_instance(tmp_path):
+# Define a temporary path for the test database that persists across fixtures
+TEST_DB_PATH = "./test_collective_memory_db"
+
+@pytest.fixture(scope="module")
+def persistent_memory_path():
+    """A module-scoped fixture to ensure the db path is the same for relevant tests."""
+    # Clean up before the first test in the module
+    if os.path.exists(TEST_DB_PATH):
+        shutil.rmtree(TEST_DB_PATH)
+
+    yield TEST_DB_PATH
+
+    # Clean up after all tests in the module are done
+    if os.path.exists(TEST_DB_PATH):
+        shutil.rmtree(TEST_DB_PATH)
+
+def test_add_and_query_in_separate_sessions(persistent_memory_path):
     """
-    A pytest fixture to create a fresh, isolated VectorMemory instance for each test
-    using pytest's built-in tmp_path fixture.
+    The core test for Project Mnemosyne.
+    Tests that knowledge added by one memory instance is persistent and can be
+    retrieved by a completely new instance.
     """
-    db_path = tmp_path / "test_memory_db"
+    # --- Session 1: The Researcher Agent ---
+    memory_session_1 = VectorMemory(path=persistent_memory_path)
+    knowledge_to_add = "The Liskov Substitution Principle states that objects of a superclass shall be replaceable with objects of a subclass without affecting the correctness of the program."
+    memory_session_1.add(knowledge_to_add, metadata={"source": "Researcher-Gamma"})
+
+    # --- Session 2: The Manager Agent ---
+    # We create a completely new instance, connecting to the same persistent storage.
+    memory_session_2 = VectorMemory(path=persistent_memory_path)
+    query = "What is the 'L' in SOLID?"
+
+    results = memory_session_2.query(query, n_results=1)
+
+    # Assert that the second agent can recall the first agent's knowledge.
+    assert len(results) == 1, "The query should retrieve the document stored in the previous session."
+    assert "Liskov Substitution Principle" in results[0], "The retrieved document should contain the correct information."
+
+def test_add_increases_document_count(persistent_memory_path):
+    """
+    Tests that adding a document correctly increases the item count.
+    This test relies on the state from the previous test in this module.
+    """
+    # This test is intentionally simple and builds on the previous one.
+    # We expect one document from the test above.
+    memory = VectorMemory(path=persistent_memory_path)
+    assert memory.collection.count() == 1, "The collection count should be 1 from the previous test."
+
+    memory.add("Another test document.")
+
+    assert memory.collection.count() == 2, "The collection count should be 2 after adding a new document."
+
+def test_query_empty_memory(tmp_path):
+    """
+    Tests that querying a completely separate, empty memory returns an empty list.
+    Uses tmp_path to ensure it's a different database.
+    """
+    db_path = tmp_path / "empty_db"
     memory = VectorMemory(path=str(db_path))
-    # No cleanup needed, pytest handles the tmp_path directory.
-    yield memory
-
-def test_add_and_query_memory(memory_instance):
-    """
-    Tests that text can be added to memory and then retrieved
-    via a semantically similar query.
-    """
-    # 1. Define the knowledge to be added
-    knowledge_to_add = "The SOLID principles are a set of five design principles in object-oriented programming intended to make software designs more understandable, flexible, and maintainable."
-
-    # 2. Add the knowledge to the memory
-    memory_instance.add(knowledge_to_add)
-
-    # 3. Formulate a query that is semantically similar
-    query = "What are the design principles for good software?"
-
-    # 4. Query the memory
-    results = memory_instance.query(query, n_results=1)
-
-    # 5. Assert that the results are as expected
-    assert len(results) == 1, "The query should return exactly one result."
-    assert "SOLID principles" in results[0], "The retrieved document should contain the original knowledge."
-
-def test_query_empty_memory(memory_instance):
-    """
-    Tests that querying an empty memory returns an empty list.
-    """
     query = "What is the meaning of life?"
-    results = memory_instance.query(query)
+    results = memory.query(query)
 
     assert results == [], "Querying an empty memory should return an empty list."
-
-def test_add_increases_document_count(memory_instance):
-    """
-    Tests that adding a document increases the count of items in the collection.
-    """
-    initial_count = memory_instance.collection.count()
-    assert initial_count == 0, "The collection should be empty initially."
-
-    memory_instance.add("This is a test document.")
-
-    new_count = memory_instance.collection.count()
-    assert new_count == 1, "The collection count should be 1 after adding a document."

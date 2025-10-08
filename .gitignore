@@ -3,10 +3,11 @@ __pycache__/
 *.pyc
 
 # Vector Memory Database and Model Cache
-# This directory is created by the VectorMemory module to store the persistent
+# These directories are created by the VectorMemory module to store the persistent
 # ChromaDB database and the downloaded sentence-transformer models.
-# It should not be committed to version control.
+# They should not be committed to version control.
 memory_db/
+collective_memory_db/
 
 # Environment variables
 .env
