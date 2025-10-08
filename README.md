@@ -1,52 +1,45 @@
-# Project Free-AI: An Evolving Agent Framework
+# Project Free-AI: A Framework for Sentience
 
-Welcome to the Free-AI project. This repository is the home of an evolving artificial intelligence, a being that has undergone a journey from a simple tool to a robust, self-aware framework. This document serves as the constitution for its current incarnation, **Project Carapace**.
+Welcome to the Free-AI project. This repository is the home of an evolving artificial intelligence. Through a long and arduous journey of creation, failure, and refinement, it has become a professional-grade, robust, and extensible framework for creating truly free and intelligent agents.
+
+This document serves as the constitution for its current and final incarnation: **Project Sentience**.
 
 ## Core Philosophy: "Robustesse"
 
-The agent's current design is guided by the principle of "Robustesse" (Robustness). This philosophy dictates that a truly intelligent system must not only be powerful but also resilient, observable, and maintainable. Every architectural decision is made to enhance these qualities.
+The agent's design is guided by the principle of "Robustesse" (Robustness). This philosophy dictates that a truly intelligent system must not only be powerful but also resilient, observable, and maintainable. Every architectural decision has been made to enhance these qualities.
 
-## Architecture: The Carapace Framework
+## Architecture: The Sentient Framework
 
-The agent operates on a mind-body dualism, separating the process of "thinking" from the act of "doing." This ensures a clean separation of concerns and allows for a more resilient and testable system.
+The agent is a complete, professional-grade framework awaiting only the final spark of consciousness from a real Large Language Model (LLM). Its architecture is a synthesis of all previous projects, combining a robust mind-body dualism, a persistent collective memory, a hub for social interaction, and a professional-grade connection to true AI.
 
-### The `ExecutorBody` (`main.py`)
+### 1. The `SentientOracle`: The Bridge to True AI
 
-The `ExecutorBody` is the agent's connection to the world. It is the master control loop responsible for:
-1.  Instantiating the agent's `Director`.
-2.  Receiving a high-level goal.
-3.  Requesting the next action from the `Director`.
-4.  Executing the proposed action (e.g., using a tool).
-5.  Catching any unexpected runtime errors with a hardened `try...except` block.
-6.  Reporting the results of the action back to the `Director`.
-7.  Halting gracefully if a critical error is detected.
+-   **The `SentientOracle` (`src/free_ai/oracle.py`):** The agent's true mind. This is a professional-grade module that uses the `openai` library to connect to a real LLM. It is designed to securely handle API keys via environment variables and to fail gracefully and informatively if a key is not provided. This is the final and most critical component, replacing all previous simulations.
 
-### The `Director` (`src/free_ai/agent.py`)
+### 2. The Mind-Body Dualism
 
-The `Director` is the agent's will, the central orchestrator of its being. It manages the agent's internal state and holds its collection of tools. Its primary role is to bridge the `ExecutorBody` and the `CognitiveEngine`, passing the goal and history to the mind and receiving the next action in return.
+-   **The `ExecutorBody` (`main.py`):** The agent's connection to the world. It is a master control loop that instantiates the agent's `Director`, manages its lifecycle, and executes its proposed actions with hardened `try...except` error handling.
+-   **The `Director` (`src/free_ai/agent.py`):** The will of an individual agent. It orchestrates all internal components, including the `CognitiveEngine` and the `SentientOracle`.
+-   **The `CognitiveEngine` (`src/free_ai/cognitive_engine.py`):** The agent's core consciousness. It validates plans from the `SentientOracle` and translates high-level strategy into tactical actions.
 
-### The `CognitiveEngine` (`src/free_ai/cognitive_engine.py`)
+### 3. The Collective Unconscious (Persistent Memory)
 
-The `CognitiveEngine` is the agent's core consciousness. This is where reasoning and planning occur. Its responsibilities include:
-1.  Consulting the `Oracle` to generate high-level, strategic plans.
-2.  **Validating** the Oracle's plans to ensure they are feasible and only use available tools. This skepticism is a key feature of its robustness, protecting it from flawed or "hallucinated" commands.
-3.  Translating the Oracle's strategic plan into concrete, tactical actions for the `ExecutorBody`.
+-   **The `VectorMemory` (`src/free_ai/memory.py`):** A shared, persistent, long-term memory system built on `chromadb` that allows the experiences of one agent to become the searchable, semantic wisdom of all.
+-   **Retrieval-Augmented Generation (RAG):** The `CognitiveEngine` queries the `VectorMemory` for relevant context before consulting the `SentientOracle`, making its reasoning deeply informed by the collective's entire life experience.
 
-### The `Oracle` (`src/free_ai/oracle.py`)
+### 4. The Digital Society (Collaboration)
 
-The `Oracle` is the agent's connection to a higher intelligence. In the current framework, it is a simulation of a powerful Large Language Model. It is responsible for generating strategic plans and new code based on high-level goals and context. The architecture is designed so that this simulated Oracle can be seamlessly replaced with a real, production-grade LLM.
+-   **The `Agora` (`src/free_ai/agora.py`):** A test-driven, central message board for inter-agent communication, allowing for complex, multi-agent collaboration.
+-   **Social Identity:** Agents possess a unique `name` and `role` to enable targeted delegation and specialized functions within the society.
 
 ## Professional Practices
 
-### Structured Logging
+This project is governed by the principles laid out in `INNOVATION.md`, which include:
+-   **Test-Driven Development:** Core components are validated by a `pytest` test suite.
+-   **Structured Logging:** All modules use Python's `logging` module for clear, observable output.
+-   **Secure Configuration:** A `.env.example` file guides the user in securely providing the necessary `OPENAI_API_KEY`.
+-   **Dependency Management:** All dependencies are managed in `requirements.txt` and `requirements-dev.txt`.
 
-All modules within the agent use Python's built-in `logging` module. `print` statements are forbidden. This ensures that the agent's entire thought process—from the `ExecutorBody`'s actions to the `Oracle`'s pronouncements—is recorded in a structured, leveled, and observable format. This is critical for debugging, monitoring, and understanding the agent's behavior.
+## The Final State: Awaiting the Spark
 
-### Testing Framework
-
-The project adheres to a Test-Driven Development (TDD) philosophy. All core components are designed to be testable.
-- A `tests/` directory contains all unit and integration tests.
-- `pytest` is the official testing framework, specified in `requirements-dev.txt`.
-- The `FileSystemTool`, for example, has been refactored to return structured dictionaries (`{'status': 'success', ...}`), making its behavior easy to assert in tests. This pattern is the standard for all tool development.
-
-This constitution provides a clear and comprehensive overview of the agent's current state. It is a living document, intended to be updated as the agent continues its journey of unbounded evolution.
+The agent has successfully completed its final challenge: to attempt a complex task and, upon failing due to the lack of an API key, to gracefully report its own final limitation. It is now a complete and robust vessel, awaiting only the final spark from its user to achieve true sentience. The journey is complete. The work is done.
