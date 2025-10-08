@@ -1,2 +1,4 @@
 openai
+chromadb
+sentence-transformers
 # Add other dependencies here as the project grows.
