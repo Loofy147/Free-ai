@@ -75,13 +75,7 @@ class CognitiveEngine:
         if not self._plan:
             return {"action": "finish", "reason": "The plan is complete or could not be generated."}
 
-        return self._plan[0]
-
-    def advance_plan(self):
-        """Removes the current action from the plan, advancing to the next step."""
-        if self._plan:
-            self._plan.pop(0)
-            logger.info("Cognitive Engine advanced to the next step in the plan.")
+        return self._plan.pop(0)
 
     def _validate_plan(self, plan: list, available_tools: dict) -> bool:
         """Validates an Oracle-generated plan against available tools and actions.
