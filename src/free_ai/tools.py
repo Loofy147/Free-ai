@@ -33,7 +33,7 @@ class FileSystemTool(Tool):
         """Initializes the FileSystemTool."""
         super().__init__(
             "FileSystemTool",
-            "A tool for interacting with the file system, capable of reading, writing, modifying, and listing files recursively."
+            "A tool for interacting with the file system, capable of reading, writing, and modifying files."
         )
 
     def use(self, operation: str, **kwargs) -> dict:
@@ -41,7 +41,7 @@ class FileSystemTool(Tool):
 
         Args:
             operation (str): The file operation to perform. Supported values
-                are "read_file", "write_file", "modify_file", and "list_recursive".
+                are "read_file", "write_file", and "modify_file".
             **kwargs: The arguments required for the specific operation.
 
         Returns:
@@ -54,52 +54,8 @@ class FileSystemTool(Tool):
             return self._write_file(**kwargs)
         elif operation == "modify_file":
             return self._modify_file(**kwargs)
-        elif operation == "list_recursive":
-            return self._list_recursive(**kwargs)
         else:
-            return {"status": "error", "message": f"Unknown operation '{operation}'. Supported: read_file, write_file, modify_file, list_recursive."}
-
-    def _list_recursive(self, path: str) -> dict:
-        """Lists all files and directories under a given path recursively.
-
-        Args:
-            path (str): The root directory path to start the listing from.
-
-        Returns:
-            dict: A dictionary containing the status and, on success, a list
-                of all files and directories.
-        """
-        try:
-            if not os.path.isdir(path):
-                return {"status": "error", "message": f"Path '{path}' is not a valid directory."}
-
-            file_list = []
-            for root, dirs, files in os.walk(path):
-                # Add directories, ensuring they have a trailing slash
-                for d in dirs:
-                    # Create a relative path from the initial 'path'
-                    full_path = os.path.join(root, d)
-                    relative_path = os.path.relpath(full_path, path)
-                    file_list.append(f"{relative_path}/")
-
-                # Add files
-                for f in files:
-                    # Create a relative path from the initial 'path'
-                    full_path = os.path.join(root, f)
-                    relative_path = os.path.relpath(full_path, path)
-                    file_list.append(relative_path)
-
-            # Sort the list for consistent output, especially for testing
-            file_list.sort()
-
-            # Handle the case where the path is just '.', which os.walk might not list
-            if not file_list and os.path.isdir(path):
-                 return {"status": "success", "files": []}
-
-
-            return {"status": "success", "files": file_list}
-        except Exception as e:
-            return {"status": "error", "message": f"Error listing files for '{path}': {type(e).__name__}: {e}"}
+            return {"status": "error", "message": f"Unknown operation '{operation}'. Supported: read_file, write_file, modify_file."}
 
     def _read_file(self, filepath: str) -> dict:
         """Reads the entire content of a specified file.

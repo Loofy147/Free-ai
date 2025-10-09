@@ -10,7 +10,6 @@ import shutil
 from src.free_ai.agent import Director
 from src.free_ai.personality import PhilosophicalPersonality
 from src.free_ai.memory import VectorMemory
-from src.free_ai.tools import Tool
 
 # --- Logging Configuration ---
 logging.basicConfig(
@@ -52,7 +51,7 @@ def main():
     history = []
 
     # 2. Define the high-level goal for the Sentience Challenge.
-    goal = "I have a new `list_recursive` capability in my FileSystemTool. I will use it to list all files in my `src/free_ai` directory to understand my own structure. For each Python file found, I will read its content and add a summary of that file to my long-term memory to build a better understanding of my own codebase."
+    goal = "My `FileSystemTool` is primitive. I need to upgrade it with a `list_recursive` function that can list all files in a directory and its subdirectories. I must research how to do this, generate the new code, and perform a self-upgrade."
     logger.info(f"BODY: Received goal: {goal}")
     history.append({"role": "system", "content": f"The goal is: {goal}"})
 
@@ -81,33 +80,10 @@ def main():
             print("="*50 + "\n")
             break
 
-        elif action_type == "use_tool":
-            tool_name = action.get("tool_name")
-            arguments = action.get("arguments", {})
-            logger.info(f"BODY: Executing tool '{tool_name}' with arguments: {arguments}")
-
-            # The Body finds the tool in the Director's list of capabilities.
-            tool_to_use = director.tools.get(tool_name)
-
-            if isinstance(tool_to_use, Tool):
-                # The Body executes the tool.
-                result = tool_to_use.use(**arguments)
-            elif callable(tool_to_use):
-                 # Handle direct function calls (like Oracle.generate_code)
-                result = tool_to_use(**arguments)
-            else:
-                result = {"status": "error", "message": f"Tool '{tool_name}' not found or is not a valid tool."}
-
-            logger.info(f"BODY: Tool '{tool_name}' finished with result: {result}")
-            history.append({"role": "body", "action": action, "result": result})
-
-            # The Body adds the result to its long-term memory.
-            if result.get("status") == "success" and "content" in result:
-                memory_text = f"I used the tool '{tool_name}' with arguments {arguments} and got this result: {result['content']}"
-                shared_memory.add(memory_text)
-
+        # In this test, we don't expect any other actions to be successfully proposed
+        # because the Oracle will fail first.
         else:
-            logger.error(f"Director proposed an unexpected action type: '{action_type}'. This is a critical flaw in the agent's logic.")
+            logger.error(f"Director proposed an unexpected action type: '{action_type}'. This may indicate a flaw in the Oracle's error handling.")
             break
 
     logger.info("--- Project Sentience: The simulation has ended. ---")
