@@ -3,21 +3,32 @@ import logging
 logger = logging.getLogger(__name__)
 
 class LearningAnnex:
+    """A module for dynamically learning new skills by executing code.
+
+    The Learning Annex provides a controlled environment for an agent to
+    expand its capabilities. It can execute a string of Python code, which is
+    expected to define and instantiate a new tool. This allows the agent to
+    create and integrate new functionalities at runtime.
+    """
     def __init__(self):
-        """
-        The Learning Annex is the heart of the agent's ability to grow.
-        It provides a controlled environment for executing Python code to learn new skills
-        by creating new tools.
-        """
+        """Initializes the Learning Annex."""
         logger.info("Learning Annex forge is lit. Ready to create new skills.")
 
     def learn_new_skill(self, skill_code: str) -> dict:
-        """
-        Executes a string of Python code to define and instantiate a new tool.
-        The provided code *must* create an instance of the new tool and assign it to
-        a variable named `new_tool`.
+        """Executes Python code to define and instantiate a new tool.
 
-        Returns a dictionary containing the result of the learning process.
+        This method uses `exec` to run the provided code. The code must
+        create an instance of a new tool class and assign it to a variable
+        named `new_tool` in the local namespace.
+
+        Args:
+            skill_code (str): A string containing the Python code for the new skill.
+
+        Returns:
+            dict: A dictionary containing the result of the operation.
+                On success, it includes `{'status': 'success', 'new_tool': ...,
+                'tool_name': ...}`.
+                On failure, it includes `{'status': 'error', 'message': ...}`.
         """
         try:
             local_namespace = {}

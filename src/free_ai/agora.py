@@ -6,17 +6,34 @@ from typing import List, Dict, Optional
 logger = logging.getLogger(__name__)
 
 class Agora:
-    """
-    The Agora is the central message board for the agent society.
-    It allows agents to post tasks and retrieve results for collaboration.
+    """A central message board for a society of agents to communicate.
+
+    The Agora facilitates collaboration by allowing agents to post tasks,
+    claim them, and post results. It acts as a centralized hub for asynchronous
+    inter-agent communication and task delegation.
+
+    Attributes:
+        message_board (List[Dict]): A list of message dictionaries that
+            represents the state of the message board.
     """
     def __init__(self):
+        """Initializes the Agora and its message board."""
         self.message_board: List[Dict] = []
         logger.info("The Agora is now open.")
 
     def post_message(self, from_agent: str, to_agent_role: str, content: Dict) -> str:
-        """
-        Posts a new message (task) to the message board.
+        """Posts a new message (e.g., a task) to the message board.
+
+        Creates a new message with a unique ID and adds it to the board. The
+        message is addressed to a specific agent role.
+
+        Args:
+            from_agent (str): The name of the agent posting the message.
+            to_agent_role (str): The role of the agent the message is for.
+            content (Dict): The content of the message, typically describing a task.
+
+        Returns:
+            str: The unique ID of the newly created message.
         """
         message_id = str(uuid.uuid4())
         message = {
@@ -33,8 +50,14 @@ class Agora:
         return message_id
 
     def get_unclaimed_messages_for_role(self, role: str) -> List[Dict]:
-        """
-        Retrieves all unclaimed messages targeted at a specific role.
+        """Retrieves all unclaimed messages targeted at a specific agent role.
+
+        Args:
+            role (str): The agent role to search for (e.g., "Programmer").
+
+        Returns:
+            List[Dict]: A list of message dictionaries that are unclaimed and
+                match the specified role.
         """
         unclaimed = [
             msg for msg in self.message_board
@@ -44,8 +67,15 @@ class Agora:
         return unclaimed
 
     def claim_message(self, message_id: str, by_agent: str):
-        """
-        Marks a message as claimed by a specific agent.
+        """Marks a message as 'claimed' by a specific agent.
+
+        This prevents other agents from attempting to work on the same message.
+        The operation is idempotent; if an agent tries to claim a message
+        that is already claimed, it will log a warning but not raise an error.
+
+        Args:
+            message_id (str): The ID of the message to claim.
+            by_agent (str): The name of the agent claiming the message.
         """
         for msg in self.message_board:
             if msg["id"] == message_id:
@@ -59,8 +89,15 @@ class Agora:
         logger.error(f"Failed to claim message: ID {message_id} not found.")
 
     def post_reply(self, original_message_id: str, from_agent: str, result: Dict):
-        """
-        Posts a reply to a previously claimed message.
+        """Posts a reply to a previously claimed message.
+
+        This is used to return the result of a completed task. A reply can
+        only be posted by the agent who originally claimed the message.
+
+        Args:
+            original_message_id (str): The ID of the message being replied to.
+            from_agent (str): The name of the agent posting the reply.
+            result (Dict): The result or outcome of the task.
         """
         for msg in self.message_board:
             if msg["id"] == original_message_id:
@@ -79,8 +116,16 @@ class Agora:
 
 
     def get_reply_for_message(self, message_id: str) -> Optional[Dict]:
-        """
-        Checks for a reply to a specific message ID.
+        """Checks for and retrieves a reply to a specific message.
+
+        This allows the original task-posting agent to retrieve the results
+        of its delegated task.
+
+        Args:
+            message_id (str): The ID of the original message.
+
+        Returns:
+            Optional[Dict]: The reply dictionary if it exists, otherwise None.
         """
         for msg in self.message_board:
             if msg["id"] == message_id:

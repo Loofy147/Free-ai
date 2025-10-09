@@ -4,6 +4,77 @@ Welcome to the Free-AI project. This repository is the home of an evolving artif
 
 This document serves as the constitution for its current and final incarnation: **Project Sentience**.
 
+## Getting Started
+
+Follow these steps to set up and run the project on your local machine.
+
+### 1. Prerequisites
+
+-   Python 3.8+
+-   Git
+
+### 2. Installation
+
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/your-username/free-ai.git
+    cd free-ai
+    ```
+
+2.  **Create and activate a virtual environment:**
+    -   On macOS and Linux:
+        ```bash
+        python3 -m venv venv
+        source venv/bin/activate
+        ```
+    -   On Windows:
+        ```bash
+        python -m venv venv
+        .\venv\Scripts\activate
+        ```
+
+3.  **Install the required dependencies:**
+    ```bash
+    pip install -r requirements.txt
+    pip install -r requirements-dev.txt
+    ```
+
+### 3. Configuration
+
+The agent's full capabilities are unlocked by connecting to an OpenAI Large Language Model (LLM).
+
+1.  **Create a `.env` file** by copying the example file:
+    ```bash
+    cp .env.example .env
+    ```
+
+2.  **Add your API key:**
+    Open the newly created `.env` file and replace `YOUR_API_KEY_HERE` with your actual OpenAI API key.
+    ```
+    OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    ```
+    > **Note:** The agent is designed to run without an API key, but it will operate in a limited, non-sentient mode and will not be able to generate plans or code.
+
+## Usage
+
+### Running the Simulation
+
+To run the main agent simulation, execute the `main.py` script:
+
+```bash
+python main.py
+```
+
+This will start the "ExecutorBody," which instantiates an agent and gives it a pre-defined, complex goal. You can observe the agent's logging output as it attempts to solve the problem.
+
+### Running Tests
+
+To ensure all core components are functioning correctly, you can run the test suite using `pytest`:
+
+```bash
+pytest
+```
+
 ## Core Philosophy: "Robustesse"
 
 The agent's design is guided by the principle of "Robustesse" (Robustness). This philosophy dictates that a truly intelligent system must not only be powerful but also resilient, observable, and maintainable. Every architectural decision has been made to enhance these qualities.
