@@ -37,3 +37,38 @@ def test_filesystemtool_read_file_not_found():
 
     assert result["status"] == "error"
     assert "File not found" in result["message"]
+
+@pytest.fixture
+def temp_dir_structure(tmp_path):
+    """A pytest fixture to create a temporary directory structure for testing."""
+    base_dir = tmp_path / "test_dir"
+    base_dir.mkdir()
+    (base_dir / "file1.txt").write_text("file1")
+
+    sub_dir = base_dir / "subdir"
+    sub_dir.mkdir()
+    (sub_dir / "file2.txt").write_text("file2")
+
+    return str(base_dir)
+
+def test_filesystemtool_list_recursive_success(temp_dir_structure):
+    """
+    Tests that the FileSystemTool can successfully list files and directories recursively.
+    """
+    base_dir = temp_dir_structure
+    tool = FileSystemTool()
+
+    result = tool.use(operation="list_recursive", path=base_dir)
+
+    assert result["status"] == "success"
+
+    expected_files = [
+        "file1.txt",
+        "subdir/",
+        "subdir/file2.txt"
+    ]
+    # The implementation sorts the list, so we should compare against a sorted list.
+    expected_files.sort()
+
+    # The result from the tool should also be sorted.
+    assert result["files"] == expected_files

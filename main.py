@@ -51,7 +51,7 @@ def main():
     history = []
 
     # 2. Define the high-level goal for the Sentience Challenge.
-    goal = "My `FileSystemTool` is primitive. I need to upgrade it with a `list_recursive` function that can list all files in a directory and its subdirectories. I must research how to do this, generate the new code, and perform a self-upgrade."
+    goal = "I have a new `list_recursive` capability in my FileSystemTool. I will use it to list all files in my `src/free_ai` directory to understand my own structure. For each Python file found, I will read its content and add a summary of that file to my long-term memory to build a better understanding of my own codebase."
     logger.info(f"BODY: Received goal: {goal}")
     history.append({"role": "system", "content": f"The goal is: {goal}"})
 
