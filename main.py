@@ -1,3 +1,10 @@
+"""The main entry point and execution loop for the Free-AI agent.
+
+This script, known as the "ExecutorBody," is responsible for setting up the
+environment, instantiating the agent's `Director`, and running a simulation
+loop. It demonstrates the agent's core capabilities and its ability to
+gracefully handle limitations, such as a missing API key.
+"""
 import logging
 import shutil
 from src.free_ai.agent import Director
@@ -14,6 +21,17 @@ logger = logging.getLogger("ExecutorBody")
 
 # --- The Main Execution Loop (The ExecutorBody) ---
 def main():
+    """Runs the main agent simulation.
+
+    This function orchestrates a complete agent lifecycle:
+    1.  Sets up a clean environment by clearing any previous memory.
+    2.  Instantiates the agent (`Director`) with a personality and memory.
+    3.  Defines a complex, high-level goal for the agent to solve.
+    4.  Enters a loop where the agent determines and attempts to execute
+        the next action in its plan.
+    5.  The loop terminates if the agent finishes, encounters an error
+        (like a missing API key), or exceeds a maximum number of steps.
+    """
     logger.info("--- Project Sentience: The ExecutorBody is awakening... ---")
 
     # Clean up memory from any previous runs to ensure a clean slate.
@@ -21,8 +39,6 @@ def main():
     shutil.rmtree(db_path, ignore_errors=True)
 
     # 1. The Body instantiates the agent's full being.
-    db_path = "./collective_memory_db"
-    shutil.rmtree(db_path, ignore_errors=True)
     shared_memory = VectorMemory(path=db_path)
     personality = PhilosophicalPersonality()
     director = Director(

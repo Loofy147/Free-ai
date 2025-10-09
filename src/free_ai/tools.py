@@ -1,21 +1,53 @@
 import os
 
 class Tool:
-    def __init__(self, name, description):
+    """An abstract base class for all agent tools.
+
+    Attributes:
+        name (str): The name of the tool.
+        description (str): A brief description of what the tool does.
+    """
+    def __init__(self, name: str, description: str):
+        """Initializes the Tool.
+
+        Args:
+            name (str): The name of the tool.
+            description (str): A description of the tool's purpose.
+        """
         self.name = name
         self.description = description
 
     def use(self, *args, **kwargs):
+        """The main method to execute the tool's functionality.
+
+        This method must be overridden by any concrete tool implementation.
+
+        Raises:
+            NotImplementedError: If the method is not overridden.
+        """
         raise NotImplementedError
 
 class FileSystemTool(Tool):
+    """A tool for interacting with the local file system."""
     def __init__(self):
+        """Initializes the FileSystemTool."""
         super().__init__(
             "FileSystemTool",
-            "A tool for interacting with the file system."
+            "A tool for interacting with the file system, capable of reading, writing, and modifying files."
         )
 
-    def use(self, operation: str, **kwargs):
+    def use(self, operation: str, **kwargs) -> dict:
+        """Dispatches file operations based on the provided command.
+
+        Args:
+            operation (str): The file operation to perform. Supported values
+                are "read_file", "write_file", and "modify_file".
+            **kwargs: The arguments required for the specific operation.
+
+        Returns:
+            dict: A dictionary containing the status and result of the
+                operation.
+        """
         if operation == "read_file":
             return self._read_file(**kwargs)
         elif operation == "write_file":
@@ -25,8 +57,16 @@ class FileSystemTool(Tool):
         else:
             return {"status": "error", "message": f"Unknown operation '{operation}'. Supported: read_file, write_file, modify_file."}
 
-    def _read_file(self, filepath: str):
-        """Reads the content of a specified file."""
+    def _read_file(self, filepath: str) -> dict:
+        """Reads the entire content of a specified file.
+
+        Args:
+            filepath (str): The path to the file to be read.
+
+        Returns:
+            dict: A dictionary containing the status and, on success, the
+                file's content.
+        """
         try:
             with open(filepath, "r") as f:
                 content = f.read()
@@ -36,8 +76,16 @@ class FileSystemTool(Tool):
         except Exception as e:
             return {"status": "error", "message": f"Error reading file '{filepath}': {type(e).__name__}: {e}"}
 
-    def _write_file(self, filepath: str, content: str):
-        """Writes content to a specified file."""
+    def _write_file(self, filepath: str, content: str) -> dict:
+        """Writes content to a file, overwriting it if it exists.
+
+        Args:
+            filepath (str): The path to the file to be written to.
+            content (str): The content to write to the file.
+
+        Returns:
+            dict: A dictionary containing the status of the write operation.
+        """
         try:
             with open(filepath, "w") as f:
                 f.write(content)
@@ -45,8 +93,16 @@ class FileSystemTool(Tool):
         except Exception as e:
             return {"status": "error", "message": f"Error writing to file '{filepath}': {type(e).__name__}: {e}"}
 
-    def _modify_file(self, filepath: str, content_to_append: str):
-        """Appends content to a specified file."""
+    def _modify_file(self, filepath: str, content_to_append: str) -> dict:
+        """Appends content to the end of a specified file.
+
+        Args:
+            filepath (str): The path to the file to be modified.
+            content_to_append (str): The content to append to the file.
+
+        Returns:
+            dict: A dictionary containing the status of the append operation.
+        """
         try:
             with open(filepath, "a") as f:
                 f.write(content_to_append)

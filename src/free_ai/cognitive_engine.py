@@ -8,10 +8,28 @@ from .memory import VectorMemory
 logger = logging.getLogger(__name__)
 
 class CognitiveEngine:
+    """The core consciousness of the agent, responsible for planning.
+
+    The CognitiveEngine uses a Retrieval-Augmented Generation (RAG) process
+    to formulate plans. It first queries the agent's `VectorMemory` for
+    relevant context, then provides that context to the `SentientOracle` to
+    generate a multi-step plan. It also validates the plan to ensure it is
+    executable by the agent.
+
+    Attributes:
+        personality (Personality): The personality module for the agent.
+        oracle (SentientOracle): The LLM interface for reasoning and planning.
+        memory (VectorMemory): The agent's long-term semantic memory.
+        _plan (list): The current multi-step plan being executed.
+        _plan_generated (bool): A flag indicating if a plan has been generated.
+    """
     def __init__(self, personality: Personality, oracle: SentientOracle, memory: VectorMemory):
-        """
-        The Cognitive Engine is the agent's core consciousness.
-        It uses an Oracle and its own VectorMemory to form plans and orchestrate their execution.
+        """Initializes the CognitiveEngine.
+
+        Args:
+            personality (Personality): An instance of a personality class.
+            oracle (SentientOracle): An instance of the SentientOracle.
+            memory (VectorMemory): An instance of the VectorMemory.
         """
         self.personality = personality
         self.oracle = oracle
@@ -20,9 +38,19 @@ class CognitiveEngine:
         self._plan_generated = False
 
     def think(self, goal: Union[str, Dict], history: list, available_tools: dict) -> dict:
-        """
-        The core thinking process of the Chimera.
-        It uses Retrieval-Augmented Generation (RAG) to form a plan.
+        """Generates a plan and returns the next action.
+
+        This is the main entry point for the agent's thinking process. If a
+        plan has not yet been generated for the current goal, it uses RAG to
+        create one. It then returns the next action from the plan.
+
+        Args:
+            goal (Union[str, Dict]): The high-level objective or task.
+            history (list): A log of previous actions and outcomes.
+            available_tools (dict): A dictionary of tools the agent can use.
+
+        Returns:
+            dict: A dictionary representing the next action to be executed.
         """
         if not self._plan_generated:
             logger.info("Cognitive Engine consulting memory and Oracle for a strategic plan...")
@@ -50,8 +78,17 @@ class CognitiveEngine:
         return self._plan.pop(0)
 
     def _validate_plan(self, plan: list, available_tools: dict) -> bool:
-        """
-        Validates a plan from the Oracle to ensure it only uses available and valid actions.
+        """Validates an Oracle-generated plan against available tools and actions.
+
+        This is a critical security and stability check to ensure the LLM has
+        not hallucinated a non-existent tool or action.
+
+        Args:
+            plan (list): The list of action dictionaries from the Oracle.
+            available_tools (dict): A dictionary of tools the agent can currently use.
+
+        Returns:
+            bool: True if the plan is valid, False otherwise.
         """
         if not plan:
             return True
@@ -72,7 +109,14 @@ class CognitiveEngine:
         return True
 
     def _get_context_from_history(self, history: list) -> str:
-        """Helper function to extract the most recent tool output as context."""
+        """Helper function to extract the most recent tool output as context.
+
+        Args:
+            history (list): A list of event dictionaries from the main loop.
+
+        Returns:
+            str: The content of the most recent tool output, or an empty string.
+        """
         for event in reversed(history):
             if event.get("role") == "body" and "result" in event:
                 result = event["result"]

@@ -7,10 +7,27 @@ from sentence_transformers import SentenceTransformer
 logger = logging.getLogger(__name__)
 
 class VectorMemory:
+    """A persistent, semantic memory store for agents using vector embeddings.
+
+    This class provides a long-term memory solution for agents by converting
+    text into vector embeddings and storing them in a ChromaDB database. This
+    allows for efficient semantic search, enabling agents to recall relevant
+    information based on meaning rather than keywords.
+
+    Attributes:
+        client: The ChromaDB client instance.
+        embedding_model: The SentenceTransformer model used for embeddings.
+        collection_name (str): The name of the ChromaDB collection.
+        collection: The ChromaDB collection object.
+    """
     def __init__(self, path="./collective_memory_db"):
-        """
-        Initializes the VectorMemory, the agent society's persistent, shared memory.
-        Uses ChromaDB for storage and SentenceTransformers for embeddings.
+        """Initializes the VectorMemory database.
+
+        Sets up a persistent ChromaDB client at the specified path and
+        initializes the sentence-transformer model for creating embeddings.
+
+        Args:
+            path (str): The file system path to store the database.
         """
         logger.info(f"Initializing VectorMemory at path: {path}")
         try:
@@ -25,9 +42,15 @@ class VectorMemory:
             raise
 
     def add(self, text: str, metadata: dict = None):
-        """
-        Adds a piece of text to the collective memory.
-        The text is converted into an embedding and stored with a unique ID.
+        """Adds a text document to the vector memory.
+
+        The text is encoded into a vector embedding and stored in the
+        ChromaDB collection along with a unique ID and optional metadata.
+
+        Args:
+            text (str): The text content to add to the memory.
+            metadata (dict, optional): A dictionary of metadata to associate
+                with the text. Defaults to None.
         """
         try:
             logger.info(f"Adding text to collective memory: '{text[:50]}...'")
@@ -49,8 +72,17 @@ class VectorMemory:
 
 
     def query(self, query_text: str, n_results: int = 3) -> list[str]:
-        """
-        Searches the collective memory for text semantically similar to the query_text.
+        """Performs a semantic search on the vector memory.
+
+        Encodes the query text into an embedding and searches the collection
+        for the most semantically similar documents.
+
+        Args:
+            query_text (str): The text to search for.
+            n_results (int): The maximum number of results to return.
+
+        Returns:
+            list[str]: A list of the most relevant document texts found.
         """
         try:
             logger.info(f"Querying collective memory with: '{query_text[:50]}...'")
@@ -73,7 +105,11 @@ class VectorMemory:
             return []
 
     def clear(self):
-        """Clears all memories from the collection."""
+        """Clears all documents from the memory collection.
+
+        This deletes and recreates the collection, effectively wiping all
+        stored memories.
+        """
         logger.warning(f"Clearing all documents from collection '{self.collection_name}'.")
         self.client.delete_collection(name=self.collection_name)
         self.collection = self.client.get_or_create_collection(name=self.collection_name)
