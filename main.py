@@ -106,6 +106,33 @@ def main():
                 memory_text = f"I used the tool '{tool_name}' with arguments {arguments} and got this result: {result['content']}"
                 shared_memory.add(memory_text)
 
+        elif action_type == "final_answer":
+            final_answer = action.get("answer", "The agent has completed its goal and has no further response.")
+            logger.info(f"BODY: Agent provides final answer: {final_answer}")
+            print("\n" + "="*50)
+            print("--- AGENT'S FINAL ANSWER ---")
+            print(final_answer)
+            print("--- END OF ANSWER ---")
+            print("="*50 + "\n")
+            break
+
+        elif action_type == "express_personality":
+            context = action.get("arguments", {}) # Pass arguments as context
+            expression = director.personality.express(context)
+            logger.info(f"BODY: Agent expresses personality: {expression}")
+            print(f"\n[{director.name} says]: {expression}\n")
+            history.append({"role": "body", "action": action, "result": {"status": "success", "message": expression}})
+
+        elif action_type == "delegate_task":
+            # Placeholder for future multi-agent collaboration
+            logger.info(f"BODY: Action 'delegate_task' is not yet implemented. Skipping.")
+            history.append({"role": "body", "action": action, "result": {"status": "skipped", "message": "Not implemented"}})
+
+        elif action_type == "wait_for_reply":
+            # Placeholder for future multi-agent collaboration
+            logger.info(f"BODY: Action 'wait_for_reply' is not yet implemented. Skipping.")
+            history.append({"role": "body", "action": action, "result": {"status": "skipped", "message": "Not implemented"}})
+
         else:
             logger.error(f"Director proposed an unexpected action type: '{action_type}'. This is a critical flaw in the agent's logic.")
             break

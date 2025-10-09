@@ -27,30 +27,38 @@ class MockOracle:
 
         logger.info("MOCK ORACLE: Generating hardcoded plan.")
 
-        # This is a simplified, representative plan. A real Oracle would generate
-        # a more complex plan with loops and conditionals.
+        # This is a more complex plan to test all action handlers.
         plan = [
+            {
+                "action": "express_personality",
+                "arguments": {},
+                "thought": "I shall begin by expressing my current state of mind before I tackle this complex goal."
+            },
             {
                 "action": "use_tool",
                 "tool_name": "FileSystemTool",
                 "arguments": {
                     "operation": "list_recursive",
-                    "path": "src/free_ai"
+                    "path": "src"
                 },
-                "thought": "First, I need to see all my own source code files."
+                "thought": "First, I need to see all the source code files to understand the project structure."
             },
             {
-                "action": "use_tool",
-                "tool_name": "FileSystemTool",
+                "action": "delegate_task",
                 "arguments": {
-                    "operation": "read_file",
-                    "filepath": "src/free_ai/agent.py"
+                    "to_agent_role": "Analyst",
+                    "task": "Please analyze the file list and identify the most critical file."
                 },
-                "thought": "Now I will read one of the files to understand it."
+                "thought": "This is a complex analysis. I will delegate the task to a specialist agent."
+            },
+            {
+                "action": "wait_for_reply",
+                "arguments": { "message_id": "<placeholder_id>" },
+                "thought": "I will now wait for the Analyst agent to reply with their findings."
             },
             {
                 "action": "final_answer",
-                "reason": "I have successfully listed and read my source code files. The next step would be to summarize and add them to memory, but for this mock test, I will stop here."
+                "answer": "I have successfully listed the files, delegated the analysis, and received the (simulated) results. The plan is complete."
             }
         ]
         self.plan_provided = True
