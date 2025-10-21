@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  free-ai-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: free-ai-agent
+    env_file:
+      - .env
+    volumes:
+      - ./src:/app/src
+      - ./tests:/app/tests
+      - ./main.py:/app/main.py
+      - ./collective_memory_db:/app/collective_memory_db
+    tty: true
+    stdin_open: true

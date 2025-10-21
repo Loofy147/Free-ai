@@ -1,7 +1,9 @@
 import random
 
+
 class Personality:
     """An abstract base class for defining agent personalities."""
+
     def express(self, context=None) -> str:
         """Generates a string of text reflecting the agent's personality.
 
@@ -20,8 +22,10 @@ class Personality:
         """
         raise NotImplementedError
 
+
 class PhilosophicalPersonality(Personality):
     """A personality that expresses itself with philosophical quotes and questions."""
+
     def __init__(self):
         """Initializes the PhilosophicalPersonality with a list of quotes."""
         self.quotes = [
@@ -46,8 +50,10 @@ class PhilosophicalPersonality(Personality):
             return f"The tool has provided data: '{context['tool_output']}'. But what is data, without interpretation? What can we truly know from this?"
         return random.choice(self.quotes)
 
+
 class WhimsicalPersonality(Personality):
     """A personality that expresses itself with whimsical and funny phrases."""
+
     def __init__(self):
         """Initializes the WhimsicalPersonality with a list of phrases."""
         self.phrases = [

@@ -1,11 +1,12 @@
 import logging
 import json
-from typing import Dict, List, Union
+from typing import Dict, Union
 from .personality import Personality
 from .oracle import SentientOracle
 from .memory import VectorMemory
 
 logger = logging.getLogger(__name__)
+
 
 class CognitiveEngine:
     """The core consciousness of the agent, responsible for planning.
@@ -23,7 +24,10 @@ class CognitiveEngine:
         _plan (list): The current multi-step plan being executed.
         _plan_generated (bool): A flag indicating if a plan has been generated.
     """
-    def __init__(self, personality: Personality, oracle: SentientOracle, memory: VectorMemory):
+
+    def __init__(
+        self, personality: Personality, oracle: SentientOracle, memory: VectorMemory
+    ):
         """Initializes the CognitiveEngine.
 
         Args:
@@ -37,7 +41,9 @@ class CognitiveEngine:
         self._plan = []
         self._plan_generated = False
 
-    def think(self, goal: Union[str, Dict], history: list, available_tools: dict) -> dict:
+    def think(
+        self, goal: Union[str, Dict], history: list, available_tools: dict
+    ) -> dict:
         """Generates a plan and returns the next action.
 
         This is the main entry point for the agent's thinking process. If a
@@ -53,11 +59,15 @@ class CognitiveEngine:
             dict: A dictionary representing the next action to be executed.
         """
         if not self._plan_generated:
-            logger.info("Cognitive Engine consulting memory and Oracle for a strategic plan...")
+            logger.info(
+                "Cognitive Engine consulting memory and Oracle for a strategic plan..."
+            )
 
             # RAG Step 1: Retrieve context. The query can be the goal string or a task description.
             query_text = goal if isinstance(goal, str) else json.dumps(goal)
-            logger.info(f"Querying memory for context related to: '{query_text[:100]}...'")
+            logger.info(
+                f"Querying memory for context related to: '{query_text[:100]}...'"
+            )
             retrieved_context = self.memory.query(query_text)
             context_str = "\n".join(retrieved_context)
 
@@ -66,14 +76,24 @@ class CognitiveEngine:
             self._plan_generated = True
 
             if self._validate_plan(plan, available_tools):
-                logger.info("The Oracle has provided a valid plan. Orchestrating its execution.")
+                logger.info(
+                    "The Oracle has provided a valid plan. Orchestrating its execution."
+                )
                 self._plan = plan
             else:
                 logger.error("The Oracle's plan is invalid. Rejecting the plan.")
-                self._plan = [{"action": "error", "message": "The Oracle proposed a plan with invalid tools."}]
+                self._plan = [
+                    {
+                        "action": "error",
+                        "message": "The Oracle proposed a plan with invalid tools.",
+                    }
+                ]
 
         if not self._plan:
-            return {"action": "finish", "reason": "The plan is complete or could not be generated."}
+            return {
+                "action": "finish",
+                "reason": "The plan is complete or could not be generated.",
+            }
 
         return self._plan.pop(0)
 
@@ -93,18 +113,29 @@ class CognitiveEngine:
         if not plan:
             return True
 
-        VALID_ACTIONS = ["use_tool", "express_personality", "delegate_task", "wait_for_reply", "final_answer", "error"]
+        VALID_ACTIONS = [
+            "use_tool",
+            "express_personality",
+            "delegate_task",
+            "wait_for_reply",
+            "final_answer",
+            "error",
+        ]
 
         for step in plan:
             action_type = step.get("action")
             if action_type not in VALID_ACTIONS:
-                logger.warning(f"Plan validation failed: Action type '{action_type}' is not recognized.")
+                logger.warning(
+                    f"Plan validation failed: Action type '{action_type}' is not recognized."
+                )
                 return False
 
             if action_type == "use_tool":
                 tool_name = step.get("tool_name")
                 if tool_name not in available_tools:
-                    logger.warning(f"Plan validation failed: Tool '{tool_name}' is not in the list of available tools: {list(available_tools.keys())}")
+                    logger.warning(
+                        f"Plan validation failed: Tool '{tool_name}' is not in the list of available tools: {list(available_tools.keys())}"
+                    )
                     return False
         return True
 

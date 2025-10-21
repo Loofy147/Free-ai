@@ -6,6 +6,7 @@ from sentence_transformers import SentenceTransformer
 
 logger = logging.getLogger(__name__)
 
+
 class VectorMemory:
     """A persistent, semantic memory store for agents using vector embeddings.
 
@@ -20,6 +21,7 @@ class VectorMemory:
         collection_name (str): The name of the ChromaDB collection.
         collection: The ChromaDB collection object.
     """
+
     def __init__(self, path="./collective_memory_db"):
         """Initializes the VectorMemory database.
 
@@ -33,10 +35,16 @@ class VectorMemory:
         try:
             self.client = chromadb.PersistentClient(path=path)
             model_cache_path = os.path.join(path, "st_cache")
-            self.embedding_model = SentenceTransformer('all-MiniLM-L6-v2', device='cpu', cache_folder=model_cache_path)
+            self.embedding_model = SentenceTransformer(
+                "all-MiniLM-L6-v2", device="cpu", cache_folder=model_cache_path
+            )
             self.collection_name = "collective_unconscious"
-            self.collection = self.client.get_or_create_collection(name=self.collection_name)
-            logger.info(f"VectorMemory initialized. Collective Unconscious '{self.collection_name}' is online.")
+            self.collection = self.client.get_or_create_collection(
+                name=self.collection_name
+            )
+            logger.info(
+                f"VectorMemory initialized. Collective Unconscious '{self.collection_name}' is online."
+            )
         except Exception as e:
             logger.error(f"Failed to initialize VectorMemory: {e}", exc_info=True)
             raise
@@ -58,18 +66,23 @@ class VectorMemory:
             doc_id = str(uuid.uuid4())
 
             # ChromaDB requires metadata to be a non-empty dict.
-            final_metadata = metadata if metadata else {"source": "unknown", "timestamp": str(uuid.uuid4())}
+            final_metadata = (
+                metadata
+                if metadata
+                else {"source": "unknown", "timestamp": str(uuid.uuid4())}
+            )
 
             self.collection.add(
                 embeddings=[embedding],
                 documents=[text],
                 metadatas=[final_metadata],
-                ids=[doc_id]
+                ids=[doc_id],
             )
-            logger.info(f"Successfully added document with ID {doc_id} to collective memory.")
+            logger.info(
+                f"Successfully added document with ID {doc_id} to collective memory."
+            )
         except Exception as e:
             logger.error(f"Failed to add text to collective memory: {e}", exc_info=True)
-
 
     def query(self, query_text: str, n_results: int = 3) -> list[str]:
         """Performs a semantic search on the vector memory.
@@ -94,11 +107,15 @@ class VectorMemory:
 
             results = self.collection.query(
                 query_embeddings=[query_embedding],
-                n_results=min(n_results, self.collection.count()) # Ensure n_results <= collection count
+                n_results=min(
+                    n_results, self.collection.count()
+                ),  # Ensure n_results <= collection count
             )
 
-            retrieved_docs = results.get('documents', [[]])[0]
-            logger.info(f"Query returned {len(retrieved_docs)} results from collective memory.")
+            retrieved_docs = results.get("documents", [[]])[0]
+            logger.info(
+                f"Query returned {len(retrieved_docs)} results from collective memory."
+            )
             return retrieved_docs
         except Exception as e:
             logger.error(f"Failed to query collective memory: {e}", exc_info=True)
@@ -110,7 +127,13 @@ class VectorMemory:
         This deletes and recreates the collection, effectively wiping all
         stored memories.
         """
-        logger.warning(f"Clearing all documents from collection '{self.collection_name}'.")
+        logger.warning(
+            f"Clearing all documents from collection '{self.collection_name}'."
+        )
         self.client.delete_collection(name=self.collection_name)
-        self.collection = self.client.get_or_create_collection(name=self.collection_name)
-        logger.info(f"Collection '{self.collection_name}' has been cleared and recreated.")
+        self.collection = self.client.get_or_create_collection(
+            name=self.collection_name
+        )
+        logger.info(
+            f"Collection '{self.collection_name}' has been cleared and recreated."
+        )

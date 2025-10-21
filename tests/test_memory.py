@@ -1,15 +1,12 @@
 import os
-import sys
 import pytest
 import shutil
-
-# Add the src directory to the Python path
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
 
 from free_ai.memory import VectorMemory
 
 # Define a temporary path for the test database that persists across fixtures
 TEST_DB_PATH = "./test_collective_memory_db"
+
 
 @pytest.fixture(scope="module")
 def persistent_memory_path():
@@ -23,6 +20,7 @@ def persistent_memory_path():
     # Clean up after all tests in the module are done
     if os.path.exists(TEST_DB_PATH):
         shutil.rmtree(TEST_DB_PATH)
+
 
 def test_add_and_query_in_separate_sessions(persistent_memory_path):
     """
@@ -43,8 +41,13 @@ def test_add_and_query_in_separate_sessions(persistent_memory_path):
     results = memory_session_2.query(query, n_results=1)
 
     # Assert that the second agent can recall the first agent's knowledge.
-    assert len(results) == 1, "The query should retrieve the document stored in the previous session."
-    assert "Liskov Substitution Principle" in results[0], "The retrieved document should contain the correct information."
+    assert (
+        len(results) == 1
+    ), "The query should retrieve the document stored in the previous session."
+    assert (
+        "Liskov Substitution Principle" in results[0]
+    ), "The retrieved document should contain the correct information."
+
 
 def test_add_increases_document_count(persistent_memory_path):
     """
@@ -54,11 +57,16 @@ def test_add_increases_document_count(persistent_memory_path):
     # This test is intentionally simple and builds on the previous one.
     # We expect one document from the test above.
     memory = VectorMemory(path=persistent_memory_path)
-    assert memory.collection.count() == 1, "The collection count should be 1 from the previous test."
+    assert (
+        memory.collection.count() == 1
+    ), "The collection count should be 1 from the previous test."
 
     memory.add("Another test document.")
 
-    assert memory.collection.count() == 2, "The collection count should be 2 after adding a new document."
+    assert (
+        memory.collection.count() == 2
+    ), "The collection count should be 2 after adding a new document."
+
 
 def test_query_empty_memory(tmp_path):
     """

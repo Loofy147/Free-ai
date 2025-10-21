@@ -1,5 +1,3 @@
-import os
-
 class Tool:
     """An abstract base class for all agent tools.
 
@@ -7,6 +5,7 @@ class Tool:
         name (str): The name of the tool.
         description (str): A brief description of what the tool does.
     """
+
     def __init__(self, name: str, description: str):
         """Initializes the Tool.
 
@@ -27,13 +26,15 @@ class Tool:
         """
         raise NotImplementedError
 
+
 class FileSystemTool(Tool):
     """A tool for interacting with the local file system."""
+
     def __init__(self):
         """Initializes the FileSystemTool."""
         super().__init__(
             "FileSystemTool",
-            "A tool for interacting with the file system, capable of reading, writing, and modifying files."
+            "A tool for interacting with the file system, capable of reading, writing, and modifying files.",
         )
 
     def use(self, operation: str, **kwargs) -> dict:
@@ -55,7 +56,10 @@ class FileSystemTool(Tool):
         elif operation == "modify_file":
             return self._modify_file(**kwargs)
         else:
-            return {"status": "error", "message": f"Unknown operation '{operation}'. Supported: read_file, write_file, modify_file."}
+            return {
+                "status": "error",
+                "message": f"Unknown operation '{operation}'. Supported: read_file, write_file, modify_file.",
+            }
 
     def _read_file(self, filepath: str) -> dict:
         """Reads the entire content of a specified file.
@@ -70,11 +74,17 @@ class FileSystemTool(Tool):
         try:
             with open(filepath, "r") as f:
                 content = f.read()
-            return {"status": "success", "content": f"Content of '{filepath}':\n---\n{content}\n---"}
+            return {
+                "status": "success",
+                "content": f"Content of '{filepath}':\n---\n{content}\n---",
+            }
         except FileNotFoundError:
             return {"status": "error", "message": f"File not found at '{filepath}'."}
         except Exception as e:
-            return {"status": "error", "message": f"Error reading file '{filepath}': {type(e).__name__}: {e}"}
+            return {
+                "status": "error",
+                "message": f"Error reading file '{filepath}': {type(e).__name__}: {e}",
+            }
 
     def _write_file(self, filepath: str, content: str) -> dict:
         """Writes content to a file, overwriting it if it exists.
@@ -89,9 +99,15 @@ class FileSystemTool(Tool):
         try:
             with open(filepath, "w") as f:
                 f.write(content)
-            return {"status": "success", "message": f"Successfully wrote to file '{filepath}'."}
+            return {
+                "status": "success",
+                "message": f"Successfully wrote to file '{filepath}'.",
+            }
         except Exception as e:
-            return {"status": "error", "message": f"Error writing to file '{filepath}': {type(e).__name__}: {e}"}
+            return {
+                "status": "error",
+                "message": f"Error writing to file '{filepath}': {type(e).__name__}: {e}",
+            }
 
     def _modify_file(self, filepath: str, content_to_append: str) -> dict:
         """Appends content to the end of a specified file.
@@ -106,6 +122,12 @@ class FileSystemTool(Tool):
         try:
             with open(filepath, "a") as f:
                 f.write(content_to_append)
-            return {"status": "success", "message": f"Successfully modified file '{filepath}'."}
+            return {
+                "status": "success",
+                "message": f"Successfully modified file '{filepath}'.",
+            }
         except Exception as e:
-            return {"status": "error", "message": f"Error modifying file '{filepath}': {type(e).__name__}: {e}"}
+            return {
+                "status": "error",
+                "message": f"Error modifying file '{filepath}': {type(e).__name__}: {e}",
+            }

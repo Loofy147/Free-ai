@@ -2,6 +2,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class LearningAnnex:
     """A module for dynamically learning new skills by executing code.
 
@@ -10,6 +11,7 @@ class LearningAnnex:
     expected to define and instantiate a new tool. This allows the agent to
     create and integrate new functionalities at runtime.
     """
+
     def __init__(self):
         """Initializes the Learning Annex."""
         logger.info("Learning Annex forge is lit. Ready to create new skills.")
@@ -38,11 +40,17 @@ class LearningAnnex:
 
             if "new_tool" in local_namespace:
                 new_tool = local_namespace["new_tool"]
-                tool_name = getattr(new_tool, 'name', 'UnnamedTool')
+                tool_name = getattr(new_tool, "name", "UnnamedTool")
 
-                logger.info(f"Successfully learned and created new tool: '{tool_name}'.")
+                logger.info(
+                    f"Successfully learned and created new tool: '{tool_name}'."
+                )
 
-                return {"status": "success", "new_tool": new_tool, "tool_name": tool_name}
+                return {
+                    "status": "success",
+                    "new_tool": new_tool,
+                    "tool_name": tool_name,
+                }
             else:
                 error_message = "The skill code did not produce a 'new_tool' object."
                 logger.error(error_message)
