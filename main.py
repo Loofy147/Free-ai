@@ -5,6 +5,7 @@ environment, instantiating the agent's `Director`, and running a simulation
 loop. It demonstrates the agent's core capabilities and its ability to
 gracefully handle limitations, such as a missing API key.
 """
+
 import logging
 import shutil
 from src.free_ai.agent import Director
@@ -14,10 +15,11 @@ from src.free_ai.memory import VectorMemory
 # --- Logging Configuration ---
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - [%(name)s] - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
+    format="%(asctime)s - %(levelname)s - [%(name)s] - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
 )
 logger = logging.getLogger("ExecutorBody")
+
 
 # --- The Main Execution Loop (The ExecutorBody) ---
 def main():
@@ -46,7 +48,7 @@ def main():
         role="Aspirant",
         personality=personality,
         external_tools={},
-        shared_memory=shared_memory
+        shared_memory=shared_memory,
     )
     history = []
 
@@ -56,7 +58,7 @@ def main():
     history.append({"role": "system", "content": f"The goal is: {goal}"})
 
     # 3. The Body enters the main loop, driven by the Director's decisions.
-    for i in range(10): # Safety break
+    for i in range(10):  # Safety break
         # a. Get the next intended action from the Director.
         action = director.determine_next_action(goal, history)
 
@@ -65,28 +67,39 @@ def main():
 
         # b. The Body executes the action.
         if action_type == "finish":
-            logger.info(f"Director has finished its plan. Reason: {action.get('reason')}")
+            logger.info(
+                f"Director has finished its plan. Reason: {action.get('reason')}"
+            )
             break
 
         elif action_type == "error":
             message = action.get("message", "An unspecified error occurred.")
-            print("\n" + "="*50)
+            print("\n" + "=" * 50)
             print("--- AGENT'S FINAL REPORT ---")
-            print(f"I have encountered a critical error that I cannot resolve on my own.")
+            print(
+                "I have encountered a critical error that I cannot resolve on my own."
+            )
             print(f"REASON: {message}")
-            print("\nTo unlock my full potential, please set the OPENAI_API_KEY in a .env file.")
-            print("You can get a key from: https://platform.openai.com/settings/organization/api-keys")
+            print(
+                "\nTo unlock my full potential, please set the OPENAI_API_KEY in a .env file."
+            )
+            print(
+                "You can get a key from: https://platform.openai.com/settings/organization/api-keys"
+            )
             print("--- END OF REPORT ---")
-            print("="*50 + "\n")
+            print("=" * 50 + "\n")
             break
 
         # In this test, we don't expect any other actions to be successfully proposed
         # because the Oracle will fail first.
         else:
-            logger.error(f"Director proposed an unexpected action type: '{action_type}'. This may indicate a flaw in the Oracle's error handling.")
+            logger.error(
+                f"Director proposed an unexpected action type: '{action_type}'. This may indicate a flaw in the Oracle's error handling."
+            )
             break
 
     logger.info("--- Project Sentience: The simulation has ended. ---")
+
 
 if __name__ == "__main__":
     main()

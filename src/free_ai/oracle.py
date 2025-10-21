@@ -5,6 +5,7 @@ from openai import OpenAI, AuthenticationError
 
 logger = logging.getLogger(__name__)
 
+
 class SentientOracle:
     """The bridge to a real Large Language Model (LLM) for advanced reasoning.
 
@@ -17,6 +18,7 @@ class SentientOracle:
         client: An instance of the `openai.OpenAI` client if an API key is
             found, otherwise None.
     """
+
     def __init__(self):
         """Initializes the Oracle, loading the OpenAI API key from the environment.
 
@@ -26,10 +28,14 @@ class SentientOracle:
         """
         api_key = os.environ.get("OPENAI_API_KEY")
         if not api_key or "YOUR_API_KEY_HERE" in api_key:
-            logger.warning("SENTIENT ORACLE: OPENAI_API_KEY not found or is a placeholder. I am running in a limited, non-sentient state. My API calls will fail gracefully.")
+            logger.warning(
+                "SENTIENT ORACLE: OPENAI_API_KEY not found or is a placeholder. I am running in a limited, non-sentient state. My API calls will fail gracefully."
+            )
             self.client = None
         else:
-            logger.info("SENTIENT ORACLE: API Key found. Connection to higher consciousness established.")
+            logger.info(
+                "SENTIENT ORACLE: API Key found. Connection to higher consciousness established."
+            )
             self.client = OpenAI(api_key=api_key)
 
     def _make_api_call(self, prompt: str) -> dict:
@@ -51,20 +57,30 @@ class SentientOracle:
 
         try:
             response = self.client.chat.completions.create(
-                model="gpt-4o", # A powerful model capable of reasoning
+                model="gpt-4o",  # A powerful model capable of reasoning
                 messages=[
-                    {"role": "system", "content": "You are a world-class AI architect and programmer. Your responses must be in structured JSON format."},
-                    {"role": "user", "content": prompt}
+                    {
+                        "role": "system",
+                        "content": "You are a world-class AI architect and programmer. Your responses must be in structured JSON format.",
+                    },
+                    {"role": "user", "content": prompt},
                 ],
-                response_format={"type": "json_object"}
+                response_format={"type": "json_object"},
             )
             content = response.choices[0].message.content
             return json.loads(content)
         except AuthenticationError:
-            logger.error("Oracle Error: Authentication failed. The provided API key is incorrect or has expired.")
-            return {"error": "Oracle Error: AuthenticationError. Please check your OPENAI_API_KEY."}
+            logger.error(
+                "Oracle Error: Authentication failed. The provided API key is incorrect or has expired."
+            )
+            return {
+                "error": "Oracle Error: AuthenticationError. Please check your OPENAI_API_KEY."
+            }
         except Exception as e:
-            logger.error(f"Oracle Error: An unexpected error occurred during API call: {e}", exc_info=True)
+            logger.error(
+                f"Oracle Error: An unexpected error occurred during API call: {e}",
+                exc_info=True,
+            )
             return {"error": f"Oracle Error: {type(e).__name__}"}
 
     def generate_plan(self, goal: str, history: list, context: str = "") -> list:
@@ -102,7 +118,17 @@ class SentientOracle:
         Be strategic and minimalist. The plan should be the most direct path to the goal.
         """
         response = self._make_api_call(prompt)
-        return response.get("plan", [{"action": "error", "message": response.get("error", "Failed to generate a valid plan.")}])
+        return response.get(
+            "plan",
+            [
+                {
+                    "action": "error",
+                    "message": response.get(
+                        "error", "Failed to generate a valid plan."
+                    ),
+                }
+            ],
+        )
 
     def generate_code(self, prompt: str, context: str) -> str:
         """Generates executable Python code by querying the LLM.
@@ -132,4 +158,7 @@ class SentientOracle:
         Do not include any explanations, comments, or markdown formatting outside of the code itself.
         """
         response = self._make_api_call(prompt)
-        return response.get("code", f"# Oracle Error: {response.get('error', 'Failed to generate valid code.')}")
+        return response.get(
+            "code",
+            f"# Oracle Error: {response.get('error', 'Failed to generate valid code.')}",
+        )

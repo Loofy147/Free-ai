@@ -1,11 +1,6 @@
-import os
-import sys
 import pytest
-
-# Add the src directory to the Python path to allow for absolute imports
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src')))
-
 from free_ai.tools import FileSystemTool
+
 
 @pytest.fixture
 def temp_file(tmp_path):
@@ -14,6 +9,7 @@ def temp_file(tmp_path):
     file_content = "Hello, world!"
     file_path.write_text(file_content)
     return file_path, file_content
+
 
 def test_filesystemtool_read_file_success(temp_file):
     """
@@ -26,6 +22,7 @@ def test_filesystemtool_read_file_success(temp_file):
 
     assert result["status"] == "success"
     assert expected_content in result["content"]
+
 
 def test_filesystemtool_read_file_not_found():
     """

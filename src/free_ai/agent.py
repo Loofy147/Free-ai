@@ -8,6 +8,7 @@ from .memory import VectorMemory
 
 logger = logging.getLogger(__name__)
 
+
 class Director:
     """The central orchestrator of an agent, managing its state and actions.
 
@@ -25,7 +26,15 @@ class Director:
         learning_annex (LearningAnnex): The module for acquiring new skills.
         tools (dict): A dictionary of available tools for the agent to use.
     """
-    def __init__(self, name: str, role: str, personality: Personality, external_tools: dict, shared_memory: VectorMemory):
+
+    def __init__(
+        self,
+        name: str,
+        role: str,
+        personality: Personality,
+        external_tools: dict,
+        shared_memory: VectorMemory,
+    ):
         """Initializes the Director and all its sub-components.
 
         Args:
@@ -82,4 +91,6 @@ class Director:
             tool_instance: An instance of the new tool to be added.
         """
         self.tools[tool_name] = tool_instance
-        logger.info(f"Successfully integrated the new tool: '{tool_name}'. Capabilities have expanded.")
+        logger.info(
+            f"Successfully integrated the new tool: '{tool_name}'. Capabilities have expanded."
+        )

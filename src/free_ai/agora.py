@@ -5,6 +5,7 @@ from typing import List, Dict, Optional
 
 logger = logging.getLogger(__name__)
 
+
 class Agora:
     """A central message board for a society of agents to communicate.
 
@@ -16,6 +17,7 @@ class Agora:
         message_board (List[Dict]): A list of message dictionaries that
             represents the state of the message board.
     """
+
     def __init__(self):
         """Initializes the Agora and its message board."""
         self.message_board: List[Dict] = []
@@ -46,7 +48,9 @@ class Agora:
             "reply": None,
         }
         self.message_board.append(message)
-        logger.info(f"Agent '{from_agent}' posted message {message_id} for role '{to_agent_role}'.")
+        logger.info(
+            f"Agent '{from_agent}' posted message {message_id} for role '{to_agent_role}'."
+        )
         return message_id
 
     def get_unclaimed_messages_for_role(self, role: str) -> List[Dict]:
@@ -60,7 +64,8 @@ class Agora:
                 match the specified role.
         """
         unclaimed = [
-            msg for msg in self.message_board
+            msg
+            for msg in self.message_board
             if msg["to_agent_role"] == role and msg["claimed_by"] is None
         ]
         logger.info(f"Found {len(unclaimed)} unclaimed messages for role '{role}'.")
@@ -81,10 +86,14 @@ class Agora:
             if msg["id"] == message_id:
                 if msg["claimed_by"] is None:
                     msg["claimed_by"] = by_agent
-                    logger.info(f"Message {message_id} has been claimed by agent '{by_agent}'.")
+                    logger.info(
+                        f"Message {message_id} has been claimed by agent '{by_agent}'."
+                    )
                     return
                 else:
-                    logger.warning(f"Agent '{by_agent}' failed to claim message {message_id}, as it was already claimed by '{msg['claimed_by']}'.")
+                    logger.warning(
+                        f"Agent '{by_agent}' failed to claim message {message_id}, as it was already claimed by '{msg['claimed_by']}'."
+                    )
                     return
         logger.error(f"Failed to claim message: ID {message_id} not found.")
 
@@ -108,12 +117,17 @@ class Agora:
                         "result": result,
                         "timestamp": time.time(),
                     }
-                    logger.info(f"Agent '{from_agent}' posted a reply to message {original_message_id}.")
+                    logger.info(
+                        f"Agent '{from_agent}' posted a reply to message {original_message_id}."
+                    )
                 else:
-                    logger.error(f"Agent '{from_agent}' cannot reply to message {original_message_id} because it was claimed by '{msg['claimed_by']}'.")
+                    logger.error(
+                        f"Agent '{from_agent}' cannot reply to message {original_message_id} because it was claimed by '{msg['claimed_by']}'."
+                    )
                 return
-        logger.error(f"Failed to post reply: Original message ID {original_message_id} not found.")
-
+        logger.error(
+            f"Failed to post reply: Original message ID {original_message_id} not found."
+        )
 
     def get_reply_for_message(self, message_id: str) -> Optional[Dict]:
         """Checks for and retrieves a reply to a specific message.
